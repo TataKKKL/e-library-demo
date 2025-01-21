@@ -18,3 +18,4 @@ A full-stack NextJS application that provides an interactive library interface.
 - **Deployment**
   - Vercel
 
+https://github.com/TataKKKL/e-library
