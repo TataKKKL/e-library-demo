@@ -1,20 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Star, Book } from 'lucide-react';
+import { Star, Book as BookIcon } from 'lucide-react';
 import Link from 'next/link';
 import data from '../../data/books.json';
-
-interface Book {
-  title: string;
-  author: string;
-  genre: string;
-  overview: string;
-  rating: number;
-  date: number;
-  places: string;
-  img: string;
-  url: string;
-}
 
 export default function Books() {
   return (
@@ -48,7 +36,7 @@ export default function Books() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <Book className="w-4 h-4" />
+                    <BookIcon className="w-4 h-4" />
                     <span className="text-sm">{book.genre}</span>
                   </div>
                   <p className="text-sm text-gray-600">{book.overview}</p>

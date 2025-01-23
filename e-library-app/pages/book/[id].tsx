@@ -3,19 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import data from '../../data/books.json';
-
-interface Book {
-  title: string;
-  author: string;
-  genre: string;
-  overview: string;
-  rating: number;
-  date: number;
-  places: string;
-  img: string;
-  url: string;
-  free?: boolean;
-}
+import type { Book } from '../../interfaces/bookInterface';
 
 export async function getStaticPaths() {
   return {

@@ -1,4 +1,4 @@
-export interface BookInterface {
+export interface Book {
     title: string;
     author: string;
     genre: string;
@@ -8,4 +8,5 @@ export interface BookInterface {
     places: string;
     img: string;
     url: string;
+    free?: boolean;
   }
