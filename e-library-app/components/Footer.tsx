@@ -5,10 +5,10 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   
   return (
-    <Card className="rounded-none">
+    <Card className="rounded-none bg-gray-100 dark:bg-gray-500">
       <CardContent className="relative p-6">
         {/* Background Text */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+        <div className="absolute inset-0 flex items-center justify-center opacity-10 text-gray-200 dark:text-gray-700">
           <span className="text-6xl font-bold text-muted-foreground whitespace-nowrap">
             © {currentYear} - Built with NextJS
           </span>
@@ -20,7 +20,7 @@ const Footer = () => {
             © {currentYear}, Built with{' '}
             <a 
               href="https://nextjs.org/"
-              className="text-primary hover:text-primary/80 transition-colors"
+              className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-600"
             >
               NextJS
             </a>
