@@ -19,14 +19,24 @@ const Sidebar = () => {
       icon: LayoutDashboard
     },
     {
+      name: 'Book',
+      href: '/book',
+      icon: LayoutDashboard
+    },
+    {
       name: 'Login',
       href: '/login',
       icon: LogIn
     }
   ];
 
-  const isActive = (path: string) => router.pathname === path;
-
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return router.pathname === '/';
+    }
+    return router.pathname.startsWith(path);
+  };
+  
   return (
     <div className="h-full min-h-screen w-64 border-r">
       <div className="space-y-4 py-4">
