@@ -1,74 +1,53 @@
-import React from 'react';
-import { Lock, Mail } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 
-const Login = () => {
+import { createClient } from '@/utils/supabase/component'
+
+export default function LoginPage() {
+  const router = useRouter()
+  const supabase = createClient()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  async function logIn() {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    console.log(error)
+    if (error) {
+      console.error(error)
+    }
+    router.push('/')
+  }
+
+  async function signUp() {
+    const { error } = await supabase.auth.signUp({ email, password })
+    console.log(email, password)
+    console.log(error)
+    if (error) {
+      console.error(error)
+    }
+    router.push('/')
+  }
+
   return (
-    <div className="flex items-center justify-center bg-background p-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
-          <CardDescription className="text-center">
-            Enter your credentials to sign in
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  placeholder="name@example.com"
-                  type="email"
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  className="pl-10"
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="remember" />
-                <Label htmlFor="remember" className="text-sm font-normal">Remember me</Label>
-              </div>
-              <Button variant="link" className="px-0">
-                Forgot password?
-              </Button>
-            </div>
-            
-            <Button type="submit" className="w-full">
-              Sign in
-            </Button>
-          </form>
-          
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Button variant="link" className="px-1">
-              Sign up
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-export default Login;
+    <main>
+      <form>
+        <label htmlFor="email">Email:</label>
+        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <label htmlFor="password">Password:</label>
+        <input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="button" onClick={logIn}>
+          Log in
+        </button>
+        <button type="button" onClick={signUp}>
+          Sign up
+        </button>
+      </form>
+    </main>
+  )
+}
