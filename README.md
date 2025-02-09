@@ -20,6 +20,37 @@ A full-stack NextJS application that provides an interactive library interface.
 
 https://github.com/TataKKKL/e-library
 
+## 1. Setup
+
+### 1.1 Create .env file
+
+create .env file
+```
+SUPABASE_KEY=
+SUPABASE_PROJECT_ID=
+SUPABASE_URL=
+NEXT_PUBLIC_BACKEND_URL="http://localhost:3000"
+GITHUB_ACCESS_TOKEN=
+NEXT_PUBLIC_FRONTEND_URL="http://localhost:3000"
+```
+### 1.2 ORM with Prisma
+Add the following to .env file to use Prisma to connect to Supabase for database operations.
+```
+# Connect to Supabase via connection pooling with Supavisor.
+DATABASE_URL=
+
+# Direct connection to the database. Used for migrations.
+DIRECT_URL=
+```
+for migration:
+```
+npx prisma migrate dev --name create_books_table
+```
+for seeding:
+```
+npx prisma db seed
+```
+
 ## 3. Backend
 * local backend
 install dependencies:
