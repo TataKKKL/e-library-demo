@@ -6,6 +6,7 @@
     "start": "ts-node api/index.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
     "@types/cors": "^2.8.17",
     "cors": "^2.8.5",
     "express": "^4.18.2"
