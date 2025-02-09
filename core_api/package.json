@@ -1,0 +1,20 @@
+{
+  "name": "express-typescript-backend",
+  "version": "1.0.0",
+  "description": "Express backend with TypeScript",
+  "scripts": {
+    "start": "ts-node api/index.ts"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.17",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.19",
+    "@vercel/node": "^3.0.17",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

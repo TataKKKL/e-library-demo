@@ -1,0 +1,43 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+/dist
+/build
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# TypeScript
+*.tsbuildinfo
+
+__pycache__/
+venv/
+memory/memory.jsonl
+memory/memory_*.jsonl
+my_fastapi_app
+.next
+node_modules/*
+/node_modules/*
+/dist/*
+dist/
+/.DS_Store
+.vercel
