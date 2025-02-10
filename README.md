@@ -10,9 +10,15 @@ A full-stack NextJS application that provides an interactive library interface.
   - Shadcn UI Components
 
 - **Backend**
-  - Node.js
+  - Express.js
 
 - **Database**
+  - Supabase
+
+- **ORM**
+  - Prisma
+
+- **Authentication**
   - Supabase
 
 - **Deployment**
