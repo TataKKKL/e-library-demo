@@ -89,5 +89,13 @@ curl -X GET https://e-library-demo-api.vercel.app/api/books/The%20Last%20Olympia
 ## 4. User Portal
 https://e-library-demo.vercel.app/
 
+```
+npm run dev
+```
+
 ## 5. Admin Portal
 https://e-library-admin-demo.vercel.app/
+
+```
+npm run dev
+```
