@@ -85,3 +85,9 @@ test the get book by title endpoint:
 curl -X GET https://e-library-demo-api.vercel.app/api/books/The%20Last%20Olympian 
 {"id":1,"title":"The Last Olympian","author":"Rick Riordan and Robert Venditti","genre":"Fiction and Greek Mythology","overview":"The greatest monster of all, the storm giant Typhon, is on the loose, wreaking havoc and destruction across the U.S. - while Kronos's army lays siege to Manhattan. Soon Percy Jackson must make the hardest choice of his life - a choice that will save or destroy the world.","rating":4.29,"publication_date":2009,"places":"United States of America","img_url":"https://covers.openlibrary.org/b/id/6624107-M.jpg","source_url":"https://openlibrary.org/works/OL492642W/The_last_Olympian?edition=ia%3Alastolympianperc00rior_740","created_at":"2025-02-08T08:34:47.514"}%
 ```
+
+## 4. User Portal
+https://e-library-demo.vercel.app/
+
+## 5. Admin Portal
+https://e-library-admin-demo.vercel.app/
