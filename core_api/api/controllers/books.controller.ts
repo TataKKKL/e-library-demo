@@ -1,7 +1,13 @@
+// books.controller.ts (Controller Layer)
 import { Request, Response } from 'express';
-import { fetchBooks, fetchBookByTitle } from '../services/books.service';
+import { 
+  fetchBooks, 
+  fetchBookByTitle, 
+  addBook, 
+  modifyBook, 
+  removeBook 
+} from '../services/books.service';
 
-// Controller function to handle GET request for books
 export const getBooksController = async (req: Request, res: Response) => {
   try {
     const books = await fetchBooks();
@@ -22,6 +28,40 @@ export const getBookByTitleController = async (req: Request, res: Response) => {
     }
     
     return res.status(200).json(book);
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const createBookController = async (req: Request, res: Response) => {
+  try {
+    const bookData = req.body;
+    const newBook = await addBook(bookData);
+    return res.status(201).json(newBook);
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const updateBookController = async (req: Request, res: Response) => {
+  try {
+    const { title } = req.params;
+    const updates = req.body;
+    const updatedBook = await modifyBook(title, updates);
+    return res.status(200).json(updatedBook);
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const deleteBookController = async (req: Request, res: Response) => {
+  try {
+    const { title } = req.params;
+    await removeBook(title);
+    return res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({ error: 'Internal Server Error' });

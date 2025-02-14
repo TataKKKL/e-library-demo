@@ -86,6 +86,31 @@ curl -X GET https://e-library-demo-api.vercel.app/api/books/The%20Last%20Olympia
 {"id":1,"title":"The Last Olympian","author":"Rick Riordan and Robert Venditti","genre":"Fiction and Greek Mythology","overview":"The greatest monster of all, the storm giant Typhon, is on the loose, wreaking havoc and destruction across the U.S. - while Kronos's army lays siege to Manhattan. Soon Percy Jackson must make the hardest choice of his life - a choice that will save or destroy the world.","rating":4.29,"publication_date":2009,"places":"United States of America","img_url":"https://covers.openlibrary.org/b/id/6624107-M.jpg","source_url":"https://openlibrary.org/works/OL492642W/The_last_Olympian?edition=ia%3Alastolympianperc00rior_740","created_at":"2025-02-08T08:34:47.514"}%
 ```
 
+```
+curl -X POST http://localhost:3001/api/books \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New Book",
+    "author": "Author Name",
+    "genre": "Fiction",
+    "overview": "Book description",
+    "rating": 4.5,
+    "publication_date": 2025,
+    "places": "Location",
+    "img_url": "https://example.com/image.jpg",
+    "source_url": "https://example.com/source"
+  }'
+
+curl -X PUT http://localhost:3001/api/books/New%20Book \
+  -H "Content-Type: application/json" \
+  -d '{
+    "img_url": "https://covers.openlibrary.org/b/id/10730548-M.jpg",
+    "source_url": "https://www.google.com/"
+  }'
+
+curl -X DELETE http://localhost:3001/api/books/New%20Book
+```
+
 ## 4. User Portal
 https://e-library-demo.vercel.app/
 
