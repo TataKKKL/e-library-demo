@@ -1,29 +1,45 @@
 // components/BooksLayout.tsx
-
 'use client';
 
-import React, { useState } from 'react';
-import type { Book } from '@/interfaces/bookInterface'; // Or wherever your Book interface is
+import React, { useState} from 'react';
+import type { Book } from '@/interfaces/bookInterface';
 
-interface BooksLayoutProps {
-  initialBooks: Book[];
+interface BookSummary {
+  id: number;
+  title: string;
+  author: string;
 }
 
-/**
- * Minimal client component to display a list of Books
- * and show details for the selected book.
- */
-export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
-  const [books] = useState<Book[]>(initialBooks);
-  const [selectedBook, setSelectedBook] = useState<Book | null>(
-    books.length ? books[0] : null
-  );
+interface BooksLayoutProps {
+  initialBooks: BookSummary[];
+}
 
-  // Basic fallback image logic (inline instead of using a toast hook)
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>
-  ) => {
-    e.currentTarget.src = '/placeholder-book.jpg'; 
+export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
+  const [books] = useState<BookSummary[]>(initialBooks);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchBookDetails = async (title: string) => {
+    setIsLoading(true);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://e-library-demo-api.vercel.app';
+      const response = await fetch(`${baseUrl}/api/books/${encodeURIComponent(title)}`);
+      console.log(response);
+      if (!response.ok) {
+        throw new Error('Failed to fetch book details');
+      }
+      const bookData = await response.json();
+      setSelectedBook(bookData);
+    } catch (error) {
+      console.error('Error fetching book details:', error);
+      setSelectedBook(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = '/placeholder-book.jpg';
     console.error('Failed to load image; using placeholder instead.');
   };
 
@@ -40,7 +56,7 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
           {books.map((book) => (
             <div
               key={book.id}
-              onClick={() => setSelectedBook(book)}
+              onClick={() => fetchBookDetails(book.title)}
               style={{
                 padding: '1rem',
                 borderBottom: '1px solid #ddd',
@@ -58,7 +74,11 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
 
       {/* Right column: Book details */}
       <div style={{ flex: 1, background: '#fafafa', padding: '1rem' }}>
-        {selectedBook ? (
+        {isLoading ? (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            Loading book details...
+          </div>
+        ) : selectedBook ? (
           <div style={{ display: 'flex', gap: '1rem' }}>
             {/* Book cover */}
             <div
@@ -81,7 +101,6 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
             <div style={{ flex: 1 }}>
               <h2 style={{ margin: 0 }}>{selectedBook.title}</h2>
               <p style={{ margin: '0.5rem 0' }}>{selectedBook.author}</p>
-              {selectedBook.free && <strong>Free!</strong>}
 
               {/* Rating */}
               {selectedBook.rating > 0 && (
@@ -93,7 +112,7 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
               {/* Publication date, places, etc. */}
               <p>
                 <small>
-                  Published: {selectedBook.publication_date}  
+                  Published: {selectedBook.publication_date}
                   {!!selectedBook.places && selectedBook.places !== 'N/A' && (
                     <> • Places: {selectedBook.places}</>
                   )}
