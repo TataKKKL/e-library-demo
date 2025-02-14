@@ -132,3 +132,5 @@ Run the following SQL migrations in your Supabase project:
 1. Navigate to the Supabase Dashboard
 2. Go to SQL Editor
 3. Copy and run the contents of `e-library-app/supabase/migrations/20240214_create_profiles.sql`
+
+
