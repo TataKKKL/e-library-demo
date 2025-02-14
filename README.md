@@ -87,7 +87,7 @@ curl -X GET https://e-library-demo-api.vercel.app/api/books/The%20Last%20Olympia
 ```
 
 ```
-curl -X POST http://localhost:3001/api/books \
+curl -X POST https://e-library-demo-api.vercel.app/api/books \
   -H "Content-Type: application/json" \
   -d '{
     "title": "New Book",
@@ -101,14 +101,14 @@ curl -X POST http://localhost:3001/api/books \
     "source_url": "https://example.com/source"
   }'
 
-curl -X PUT http://localhost:3001/api/books/New%20Book \
+curl -X PUT https://e-library-demo-api.vercel.app/api/books/New%20Book \
   -H "Content-Type: application/json" \
   -d '{
     "img_url": "https://covers.openlibrary.org/b/id/10730548-M.jpg",
     "source_url": "https://www.google.com/"
   }'
 
-curl -X DELETE http://localhost:3001/api/books/New%20Book
+curl -X DELETE https://e-library-demo-api.vercel.app/api/books/New%20Book
 ```
 
 ## 4. User Portal
