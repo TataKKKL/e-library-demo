@@ -1,14 +1,9 @@
 // components/BooksLayout.tsx
-'use client';
-
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import type { Book } from '@/interfaces/bookInterface';
+import BookModal from './BookModal';
 
-interface BookSummary {
-  id: number;
-  title: string;
-  author: string;
-}
+type BookSummary = Pick<Book, 'id' | 'title' | 'author'>;
 
 interface BooksLayoutProps {
   initialBooks: BookSummary[];
@@ -18,16 +13,14 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
   const [books] = useState<BookSummary[]>(initialBooks);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchBookDetails = async (title: string) => {
     setIsLoading(true);
     try {
       const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://e-library-demo-api.vercel.app';
       const response = await fetch(`${baseUrl}/api/books/${encodeURIComponent(title)}`);
-      console.log(response);
-      if (!response.ok) {
-        throw new Error('Failed to fetch book details');
-      }
+      if (!response.ok) throw new Error('Failed to fetch book details');
       const bookData = await response.json();
       setSelectedBook(bookData);
     } catch (error) {
@@ -40,124 +33,136 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     e.currentTarget.src = '/placeholder-book.jpg';
-    console.error('Failed to load image; using placeholder instead.');
+  };
+
+  const handleCreateBook = (bookData: Omit<Book, 'id' | 'created_at' | 'img_url' | 'source_url'>) => {
+    console.log('New book data:', bookData);
+    setIsModalOpen(false);
   };
 
   return (
-    <div style={{ display: 'flex', height: '100%' }}>
-      {/* Left column: Book list */}
-      <div style={{ width: '300px', borderRight: '1px solid #ccc' }}>
-        <div style={{ padding: '1rem', borderBottom: '1px solid #ccc' }}>
-          <h2>Library</h2>
-          <p>{books.length} books</p>
-        </div>
-
-        <div style={{ maxHeight: 'calc(100vh - 10rem)', overflowY: 'auto' }}>
-          {books.map((book) => (
-            <div
-              key={book.id}
-              onClick={() => fetchBookDetails(book.title)}
-              style={{
-                padding: '1rem',
-                borderBottom: '1px solid #ddd',
-                cursor: 'pointer',
-                background:
-                  book.id === selectedBook?.id ? '#f0f8ff' : 'transparent',
-              }}
-            >
-              <h3 style={{ margin: 0 }}>{book.title}</h3>
-              <small>{book.author}</small>
+    <div className="flex flex-col h-full">
+      {/* Top Navigation */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <span>Home</span>
+              <span>/</span>
+              <span className="text-gray-900">Library</span>
+              <span className="ml-4 px-2 py-1 bg-gray-100 rounded">
+                {books.length} books
+              </span>
             </div>
-          ))}
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Create New Book
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Right column: Book details */}
-      <div style={{ flex: 1, background: '#fafafa', padding: '1rem' }}>
-        {isLoading ? (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            Loading book details...
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left column: Book list */}
+        <div className="w-72 border-r border-gray-200">
+          <div className="p-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold">Library</h2>
           </div>
-        ) : selectedBook ? (
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            {/* Book cover */}
-            <div
-              style={{
-                width: '128px',
-                height: '192px',
-                overflow: 'hidden',
-                position: 'relative',
-              }}
-            >
-              <img
-                src={selectedBook.img_url}
-                alt={selectedBook.title}
-                onError={handleImageError}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
 
-            {/* Book info */}
-            <div style={{ flex: 1 }}>
-              <h2 style={{ margin: 0 }}>{selectedBook.title}</h2>
-              <p style={{ margin: '0.5rem 0' }}>{selectedBook.author}</p>
+          <div className="overflow-y-auto h-[calc(100vh-10rem)]">
+            {books.map((book) => (
+              <div
+                key={book.id}
+                onClick={() => fetchBookDetails(book.title)}
+                className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 ${
+                  book.id === selectedBook?.id ? 'bg-blue-50' : ''
+                }`}
+              >
+                <h3 className="font-medium">{book.title}</h3>
+                <small className="text-gray-600">{book.author}</small>
+              </div>
+            ))}
+          </div>
+        </div>
 
-              {/* Rating */}
-              {selectedBook.rating > 0 && (
-                <p>
-                  Rating: <strong>{selectedBook.rating}</strong>
-                </p>
-              )}
+        {/* Right column: Book details */}
+        <div className="flex-1 bg-gray-50 p-4">
+          {isLoading ? (
+            <div className="text-center p-8">Loading book details...</div>
+          ) : selectedBook ? (
+            <div className="flex gap-4">
+              <div className="w-32 h-48 overflow-hidden relative">
+                <img
+                  src={selectedBook.img_url}
+                  alt={selectedBook.title}
+                  onError={handleImageError}
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
-              {/* Publication date, places, etc. */}
-              <p>
-                <small>
+              <div className="flex-1">
+                <h2 className="text-2xl font-semibold">{selectedBook.title}</h2>
+                <p className="text-gray-600 mt-1">{selectedBook.author}</p>
+
+                {selectedBook.rating > 0 && (
+                  <p className="mt-2">
+                    Rating: <strong>{selectedBook.rating}</strong>
+                  </p>
+                )}
+
+                <p className="text-sm text-gray-500 mt-2">
                   Published: {selectedBook.publication_date}
                   {!!selectedBook.places && selectedBook.places !== 'N/A' && (
                     <> • Places: {selectedBook.places}</>
                   )}
-                </small>
-              </p>
-
-              {/* Overview */}
-              <div style={{ marginTop: '1rem' }}>
-                <h3>Overview</h3>
-                <p>{selectedBook.overview}</p>
-              </div>
-
-              {/* Genre */}
-              {selectedBook.genre && (
-                <div style={{ marginTop: '1rem' }}>
-                  <h3>Genre</h3>
-                  <p>{selectedBook.genre}</p>
-                </div>
-              )}
-
-              {/* External link */}
-              {selectedBook.source_url && (
-                <p style={{ marginTop: '1rem' }}>
-                  <a
-                    href={selectedBook.source_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View Source
-                  </a>
                 </p>
-              )}
 
-              {/* Created_at */}
-              <p style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#999' }}>
-                Added on {new Date(selectedBook.created_at).toLocaleDateString()}
-              </p>
+                <div className="mt-4">
+                  <h3 className="font-semibold">Overview</h3>
+                  <p className="mt-1 text-gray-700">{selectedBook.overview}</p>
+                </div>
+
+                {selectedBook.genre && (
+                  <div className="mt-4">
+                    <h3 className="font-semibold">Genre</h3>
+                    <p className="mt-1 text-gray-700">{selectedBook.genre}</p>
+                  </div>
+                )}
+
+                {selectedBook.source_url && (
+                  <p className="mt-4">
+                    <a
+                      href={selectedBook.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      View Source
+                    </a>
+                  </p>
+                )}
+
+                <p className="mt-4 text-sm text-gray-500">
+                  Added on {new Date(selectedBook.created_at).toLocaleDateString()}
+                </p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div style={{ textAlign: 'center', color: '#777' }}>
-            Select a book to view details
-          </div>
-        )}
+          ) : (
+            <div className="text-center text-gray-500">
+              Select a book to view details
+            </div>
+          )}
+        </div>
       </div>
+
+      <BookModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateBook}
+      />
     </div>
   );
 }
