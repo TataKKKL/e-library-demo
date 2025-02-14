@@ -58,6 +58,7 @@ npx prisma db seed
 ```
 
 ## 3. Backend
+### 3.1 Local Backend
 * local backend
 install dependencies:
 ```
@@ -80,6 +81,7 @@ test the hello endpoint:
 curl -X GET https://e-library-demo-api.vercel.app/api/hello
 {"name":"John Doe"}%
 ```
+### 3.2 Book CRUD
 test the get book by title endpoint:
 ```
 curl -X GET https://e-library-demo-api.vercel.app/api/books/The%20Last%20Olympian 
@@ -109,6 +111,32 @@ curl -X PUT https://e-library-demo-api.vercel.app/api/books/New%20Book \
   }'
 
 curl -X DELETE https://e-library-demo-api.vercel.app/api/books/New%20Book
+```
+
+### 3.3 Book likes
+```
+curl -X POST 'https://[YOUR_SUPABASE_PROJECT_URL]/auth/v1/token?grant_type=password' \
+  -H "apikey: [YOUR_SUPABASE_ANON_KEY]" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "danqing0703@gmail.com",
+    "password": "123456"
+  }'
+
+# Toggle like for book with ID 123
+curl -X POST 'http://localhost:3001/api/book-likes/1' \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+
+# Get user's liked books
+curl -X GET 'http://localhost:3001/api/book-likes/user' \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+
+# Get all likes for book 123 (no auth needed)
+curl -X GET 'http://localhost:3001/api/book-likes/book/1' \
+  -H "Content-Type: application/json"
+
 ```
 
 ## 4. User Portal
