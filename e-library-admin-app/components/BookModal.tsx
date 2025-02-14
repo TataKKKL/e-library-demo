@@ -32,39 +32,11 @@ export default function BookModal({ isOpen, onClose, onSubmit }: BookModalProps)
     setIsLoading(true);
     setError(null);
 
-    console.log('Submitting book data:', newBook);
-
     try {
-      const response = await fetch('https://e-library-demo-api.vercel.app/api/books', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(newBook),
-      });
-
-      const responseData = await response.text();
-      let parsedData;
-      
-      try {
-        parsedData = JSON.parse(responseData);
-      } catch {
-        console.error('Failed to parse response:', responseData);
-      }
-
-      if (!response.ok) {
-        const errorMessage = parsedData?.message || responseData || `Server error: ${response.status}`;
-        console.error('Server response:', {
-          status: response.status,
-          statusText: response.statusText,
-          data: responseData
-        });
-        throw new Error(errorMessage);
-      }
-
-      onSubmit(parsedData);
+      // Call the parent's onSubmit directly with the form data
+      await onSubmit(newBook as Book);
       setNewBook(initialBookData);
+      onClose();
     } catch (err) {
       console.error('Error submitting book:', err);
       setError(

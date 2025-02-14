@@ -1,43 +1,65 @@
-// pages/index.tsx
-import BooksLayout from '@/components/BooksLayout'
-import type { Book } from '@/interfaces/bookInterface'
+import { GetServerSideProps } from 'next';
+import Head from 'next/head';
+import BooksLayout from '@/components/BooksLayout';
+import type { Book } from '@/interfaces/bookInterface';
 
-interface BookSummary {
-  id: number;
-  title: string;
-  author: string;
+type BookSummary = Pick<Book, 'id' | 'title' | 'author' | 'created_at'>;
+
+interface HomeProps {
+  books: BookSummary[];
 }
 
-export async function getServerSideProps() {
+// Server-side data fetching
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://e-library-demo-api.vercel.app'
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://e-library-demo-api.vercel.app';
+    const res = await fetch(`${baseUrl}/api/books`);
     
-    const res = await fetch(`${baseUrl}/api/books`)
     if (!res.ok) {
-      throw new Error('Failed to fetch books')
+      throw new Error(`Failed to fetch books: ${res.status}`);
     }
-    const fullBooks = await res.json()
+    
+    const fullBooks: Book[] = await res.json();
     
     // Extract only the necessary summary information
-    const books: BookSummary[] = fullBooks.map((book: Book) => ({
+    const books: BookSummary[] = fullBooks.map((book) => ({
       id: book.id,
       title: book.title,
-      author: book.author
-    }))
+      author: book.author,
+      created_at: book.created_at
+    }));
 
-    return { props: { books } }
+    return {
+      props: {
+        books
+      }
+    };
   } catch (error) {
-    console.error('Error fetching books:', error)
-    return { props: { books: [] } }
+    console.error('Error fetching books:', error);
+    return {
+      props: {
+        books: []
+      },
+      // Optionally, you could add a revalidate property if you want to attempt fetching again after a certain time
+      // revalidate: 60 // in seconds
+    };
   }
-}
+};
 
-function BooksPage({ books }: { books: BookSummary[] }) {
+export default function BooksPage({ books }: HomeProps) {
   return (
-    <main className="flex-1 overflow-hidden">
-      <BooksLayout initialBooks={books} />
-    </main>
-  )
-}
+    <>
+      <Head>
+        <title>Library | Book Collection</title>
+        <meta name="description" content="Browse and manage your book collection" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
 
-export default BooksPage
+      <div className="min-h-screen bg-white">
+        <main className="flex-1 overflow-hidden">
+          <BooksLayout initialBooks={books} />
+        </main>
+      </div>
+    </>
+  );
+}

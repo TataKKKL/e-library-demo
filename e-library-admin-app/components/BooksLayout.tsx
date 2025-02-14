@@ -1,9 +1,9 @@
-// components/BooksLayout.tsx
 import React, { useState } from 'react';
 import type { Book } from '@/interfaces/bookInterface';
 import BookModal from './BookModal';
+import { Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 
-type BookSummary = Pick<Book, 'id' | 'title' | 'author'>;
+type BookSummary = Pick<Book, 'id' | 'title' | 'author' | 'created_at'>;
 
 interface BooksLayoutProps {
   initialBooks: BookSummary[];
@@ -12,25 +12,10 @@ interface BooksLayoutProps {
 export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
   const [books, setBooks] = useState<BookSummary[]>(initialBooks);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [selectedBookIds, setSelectedBookIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const fetchBooks = async () => {
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://e-library-demo-api.vercel.app';
-      const response = await fetch(`${baseUrl}/api/books`);
-      if (!response.ok) throw new Error('Failed to fetch books');
-      const fullBooks = await response.json();
-      const bookSummaries: BookSummary[] = fullBooks.map((book: Book) => ({
-        id: book.id,
-        title: book.title,
-        author: book.author
-      }));
-      setBooks(bookSummaries);
-    } catch (error) {
-      console.error('Error fetching books:', error);
-    }
-  };
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const fetchBookDetails = async (title: string) => {
     setIsLoading(true);
@@ -53,14 +38,81 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
   };
 
   const handleCreateBook = async (bookData: Book) => {
-    console.log('New book data:', bookData);
-    await fetchBooks(); // Refresh the books list after creating a new book
-    setIsModalOpen(false);
-    // If the newly created book is available, select it
-    if (bookData.title) {
-      await fetchBookDetails(bookData.title);
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://e-library-demo-api.vercel.app';
+      const response = await fetch(`${baseUrl}/api/books`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookData),
+      });
+      
+      if (!response.ok) throw new Error('Failed to create book');
+      
+      const newBook = await response.json();
+      setBooks(prevBooks => [...prevBooks, {
+        id: newBook.id,
+        title: newBook.title,
+        author: newBook.author,
+        created_at: newBook.created_at
+      }]);
+      
+      setIsModalOpen(false);
+      if (newBook.title) {
+        await fetchBookDetails(newBook.title);
+      }
+    } catch (error) {
+      console.error('Error creating book:', error);
     }
   };
+
+  const toggleBookSelection = (bookId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    const newSelectedBooks = new Set(selectedBookIds);
+    if (newSelectedBooks.has(bookId)) {
+      newSelectedBooks.delete(bookId);
+    } else {
+      newSelectedBooks.add(bookId);
+    }
+    setSelectedBookIds(newSelectedBooks);
+  };
+
+  const handleRemoveSelected = async () => {
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://e-library-demo-api.vercel.app';
+    
+    try {
+      const selectedBooks = books.filter(book => selectedBookIds.has(String(book.id)));
+      
+      const deletePromises = selectedBooks.map(async (book) => {
+        const response = await fetch(`${baseUrl}/api/books/${encodeURIComponent(book.title)}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) throw new Error(`Failed to delete book ${book.title}`);
+      });
+
+      await Promise.all(deletePromises);
+      
+      // Update local state after successful deletion
+      setBooks(prevBooks => prevBooks.filter(book => !selectedBookIds.has(String(book.id))));
+      setSelectedBookIds(new Set());
+      if (selectedBook && selectedBookIds.has(String(selectedBook.id))) {
+        setSelectedBook(null);
+      }
+    } catch (error) {
+      console.error('Error removing books:', error);
+    }
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(prevOrder => prevOrder === 'asc' ? 'desc' : 'asc');
+  };
+
+  const sortedBooks = [...books].sort((a, b) => {
+    const dateA = new Date(a.created_at).getTime();
+    const dateB = new Date(b.created_at).getTime();
+    return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+  });
 
   return (
     <div className="flex flex-col h-full">
@@ -76,12 +128,23 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
                 {books.length} books
               </span>
             </div>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Create New Book
-            </button>
+            <div className="flex items-center space-x-4">
+              {selectedBookIds.size > 0 && (
+                <button
+                  onClick={handleRemoveSelected}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 flex items-center"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Remove Selected ({selectedBookIds.size})
+                </button>
+              )}
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Create New Book
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -91,11 +154,29 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
         {/* Left column: Book list */}
         <div className="w-72 border-r border-gray-200">
           <div className="p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold">Library</h2>
-          </div>
+            <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Library</h2>
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600">
+                    {sortOrder === 'asc' ? 'Earliest first' : 'Latest first'}
+                    </span>
+                    <button
+                    onClick={toggleSortOrder}
+                    className="p-1 hover:bg-gray-100 rounded flex items-center gap-1"
+                    title="Sort by creation date"
+                    >
+                    {sortOrder === 'asc' ? (
+                        <ChevronUp className="w-5 h-5" />
+                    ) : (
+                        <ChevronDown className="w-5 h-5" />
+                    )}
+                    </button>
+                </div>
+                </div>
+            </div>
 
           <div className="overflow-y-auto h-[calc(100vh-10rem)]">
-            {books.map((book) => (
+            {sortedBooks.map((book) => (
               <div
                 key={book.id}
                 onClick={() => fetchBookDetails(book.title)}
@@ -103,8 +184,21 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
                   book.id === selectedBook?.id ? 'bg-blue-50' : ''
                 }`}
               >
-                <h3 className="font-medium">{book.title}</h3>
-                <small className="text-gray-600">{book.author}</small>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedBookIds.has(String(book.id))}
+                    onChange={(e) => toggleBookSelection(String(book.id), e as unknown as React.MouseEvent)}
+                    className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                  />
+                  <div>
+                    <h3 className="font-medium">{book.title}</h3>
+                    <small className="text-gray-600">{book.author}</small>
+                    <div className="text-xs text-gray-400">
+                      Added {new Date(book.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
