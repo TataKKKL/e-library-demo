@@ -10,10 +10,27 @@ interface BooksLayoutProps {
 }
 
 export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
-  const [books] = useState<BookSummary[]>(initialBooks);
+  const [books, setBooks] = useState<BookSummary[]>(initialBooks);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const fetchBooks = async () => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://e-library-demo-api.vercel.app';
+      const response = await fetch(`${baseUrl}/api/books`);
+      if (!response.ok) throw new Error('Failed to fetch books');
+      const fullBooks = await response.json();
+      const bookSummaries: BookSummary[] = fullBooks.map((book: Book) => ({
+        id: book.id,
+        title: book.title,
+        author: book.author
+      }));
+      setBooks(bookSummaries);
+    } catch (error) {
+      console.error('Error fetching books:', error);
+    }
+  };
 
   const fetchBookDetails = async (title: string) => {
     setIsLoading(true);
@@ -35,9 +52,14 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
     e.currentTarget.src = '/placeholder-book.jpg';
   };
 
-  const handleCreateBook = (bookData: Omit<Book, 'id' | 'created_at' | 'img_url' | 'source_url'>) => {
+  const handleCreateBook = async (bookData: Book) => {
     console.log('New book data:', bookData);
+    await fetchBooks(); // Refresh the books list after creating a new book
     setIsModalOpen(false);
+    // If the newly created book is available, select it
+    if (bookData.title) {
+      await fetchBookDetails(bookData.title);
+    }
   };
 
   return (

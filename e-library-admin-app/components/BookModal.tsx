@@ -7,7 +7,7 @@ type BookFormData = Omit<Book, 'id' | 'created_at' | 'free'>;
 interface BookModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (bookData: BookFormData) => void;
+  onSubmit: (bookData: Book) => void;
 }
 
 const initialBookData: BookFormData = {
@@ -65,7 +65,6 @@ export default function BookModal({ isOpen, onClose, onSubmit }: BookModalProps)
 
       onSubmit(parsedData);
       setNewBook(initialBookData);
-      onClose();
     } catch (err) {
       console.error('Error submitting book:', err);
       setError(
