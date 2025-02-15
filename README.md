@@ -152,6 +152,7 @@ https://e-library-admin-demo.vercel.app/
 ```
 npm run dev
 ```
+since admin and user share the same supabase project, we created row management system and give admin user full access to the database.
 
 ## 6. Additional Database Setup
 
