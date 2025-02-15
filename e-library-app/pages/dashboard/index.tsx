@@ -1,16 +1,23 @@
 import React from 'react';
 import type { GetServerSidePropsContext } from 'next';
 import type { User } from '@supabase/supabase-js';
+import { withServerPropsAuth, makeServerPropsAuthRequest } from '@/utils/auth/authServerPropsHandler';
 
-import { createClient } from '@/utils/supabase/server-props';
+interface LikedBook {
+  profile_id: string;
+  book_id: number;
+  created_at: string;
+}
 
 interface UserDashboardProps {
   user: User;
+  likedBooks: LikedBook[];
 }
 
-const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
-  console.log(user);
-  console.log(user.email);
+const UserDashboard: React.FC<UserDashboardProps> = ({ user, likedBooks }) => {
+  console.log('[UserDashboard] Rendering with user:', user);
+  console.log('[UserDashboard] Liked books:', likedBooks);
+
   return (
     <div className="p-8">
       {/* Header */}
@@ -19,29 +26,70 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
         <p className="text-muted-foreground">Welcome back, {user.email}!</p>
       </div>
 
+      {/* Liked Books Section */}
+      <div className="space-y-6">
+        <h2 className="text-2xl font-semibold">Liked Books</h2>
+
+        {likedBooks.length === 0 ? (
+          <div className="text-muted-foreground">You haven&apos;t liked any books yet.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {likedBooks.map((book) => (
+              <div 
+                key={book.book_id} 
+                className="p-4 border rounded-lg shadow-sm"
+              >
+                <p className="font-semibold">Book ID: {book.book_id}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 export default UserDashboard;
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClient(context)
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  console.log('[getServerSideProps] Starting dashboard data fetch');
+  console.log('[getServerSideProps] Cookies:', context.req.cookies);
+  
+  // Get the Supabase cookie name
+  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || process.env.SUPABASE_PROJECT_ID;
+  const cookieName = `sb-${projectRef}-auth-token`;
+  
+  console.log('[getServerSideProps] Looking for cookie:', cookieName);
+  console.log('[getServerSideProps] Cookie value:', context.req.cookies[cookieName]);
 
-  const { data, error } = await supabase.auth.getUser()
+  return withServerPropsAuth(context, async (user, accessToken) => {
+    console.log('[getServerSideProps] Auth check - User:', !!user);
+    console.log('[getServerSideProps] Auth check - Token:', !!accessToken);
 
-  if (error || !data?.user) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
+    try {
+      console.log('[getServerSideProps] Fetching liked books');
+      
+      const likedBooks = await makeServerPropsAuthRequest(
+        context,
+        '/api/book-likes/user'
+      );
+      
+      console.log('[getServerSideProps] Fetched liked books:', likedBooks);
+
+      return {
+        props: {
+          user,
+          likedBooks,
+        },
+      };
+    } catch (error) {
+      console.error('[getServerSideProps] Error fetching liked books:', error);
+      return {
+        props: {
+          user,
+          likedBooks: [],
+        },
+      };
     }
-  }
-
-  return {
-    props: {
-      user: data.user,
-    },
-  }
-}
+  });
+};
