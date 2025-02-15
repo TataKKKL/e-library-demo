@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import type { GetServerSidePropsContext } from 'next';
 import type { User } from '@supabase/supabase-js';
 import { withServerPropsAuth, makeServerPropsAuthRequest } from '@/utils/auth/authServerPropsHandler';
@@ -35,12 +36,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, likedBooks }) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {likedBooks.map((book) => (
-              <div 
-                key={book.book_id} 
-                className="p-4 border rounded-lg shadow-sm"
+              <Link
+                key={book.book_id}
+                href={`/book/${encodeURIComponent(book.book_id)}`}
+                className="block"
               >
-                <p className="font-semibold">Book ID: {book.book_id}</p>
-              </div>
+                <div className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                  <p className="font-semibold">Book ID: {book.book_id}</p>
+                </div>
+              </Link>
             ))}
           </div>
         )}
@@ -54,11 +58,11 @@ export default UserDashboard;
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   console.log('[getServerSideProps] Starting dashboard data fetch');
   console.log('[getServerSideProps] Cookies:', context.req.cookies);
-  
+
   // Get the Supabase cookie name
   const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || process.env.SUPABASE_PROJECT_ID;
   const cookieName = `sb-${projectRef}-auth-token`;
-  
+
   console.log('[getServerSideProps] Looking for cookie:', cookieName);
   console.log('[getServerSideProps] Cookie value:', context.req.cookies[cookieName]);
 
@@ -68,12 +72,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
     try {
       console.log('[getServerSideProps] Fetching liked books');
-      
+
       const likedBooks = await makeServerPropsAuthRequest(
         context,
         '/api/book-likes/user'
       );
-      
+
       console.log('[getServerSideProps] Fetched liked books:', likedBooks);
 
       return {

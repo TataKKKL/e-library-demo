@@ -44,7 +44,7 @@ export default function Books({ books }: BooksProps) {
       <h1 className="text-3xl font-bold mb-6">Book Collection</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {books.map((book, index) => (
-          <Link href={`/book/${encodeURIComponent(book.title)}`} key={index}>
+          <Link href={`/book/${encodeURIComponent(book.id)}`} key={index}>
             <Card className="h-full hover:shadow-lg transition-shadow duration-200">
               <CardHeader>
                 <img

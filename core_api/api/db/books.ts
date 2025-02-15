@@ -1,4 +1,3 @@
-// books.ts (Database Layer)
 import { supabase } from '../lib/supabase';
 import { Book } from '../models/book';
 
@@ -8,11 +7,11 @@ export const getBooks = async (): Promise<Book[]> => {
   return data as Book[];
 };
 
-export const getBookByTitle = async (title: string): Promise<Book | null> => {
+export const getBookById = async (id: string): Promise<Book | null> => {
   const { data, error } = await supabase
     .from('books')
     .select('*')
-    .eq('title', title)
+    .eq('id', id)
     .single();
 
   if (error) throw new Error(error.message);
@@ -30,11 +29,11 @@ export const createBook = async (book: Omit<Book, 'id' | 'created_at'>): Promise
   return data as Book;
 };
 
-export const updateBook = async (title: string, updates: Partial<Book>): Promise<Book> => {
+export const updateBook = async (id: string, updates: Partial<Book>): Promise<Book> => {
   const { data, error } = await supabase
     .from('books')
     .update(updates)
-    .eq('title', title)
+    .eq('id', id)
     .select()
     .single();
 
@@ -42,11 +41,11 @@ export const updateBook = async (title: string, updates: Partial<Book>): Promise
   return data as Book;
 };
 
-export const deleteBook = async (title: string): Promise<void> => {
+export const deleteBook = async (id: string): Promise<void> => {
   const { error } = await supabase
     .from('books')
     .delete()
-    .eq('title', title);
+    .eq('id', id);
 
   if (error) throw new Error(error.message);
 };

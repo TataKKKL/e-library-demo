@@ -1,8 +1,7 @@
-// book.routes.ts (Routes)
 import { Router } from 'express';
 import {
   getBooksController,
-  getBookByTitleController,
+  getBookByIdController,
   createBookController,
   updateBookController,
   deleteBookController
@@ -11,9 +10,9 @@ import {
 const router = Router();
 
 router.get('/', getBooksController);
-router.get('/:title', getBookByTitleController);
+router.get('/:id', getBookByIdController);
 router.post('/', createBookController);
-router.put('/:title', updateBookController);
-router.delete('/:title', deleteBookController);
+router.put('/:id', updateBookController);
+router.delete('/:id', deleteBookController);
 
 export default router;
