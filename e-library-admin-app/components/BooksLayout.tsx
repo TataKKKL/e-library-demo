@@ -17,11 +17,11 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  const fetchBookDetails = async (title: string) => {
+  const fetchBookDetails = async (id: number) => {
     setIsLoading(true);
     try {
       const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://e-library-demo-api.vercel.app';
-      const response = await fetch(`${baseUrl}/api/books/${encodeURIComponent(title)}`);
+      const response = await fetch(`${baseUrl}/api/books/${id}`);
       if (!response.ok) throw new Error('Failed to fetch book details');
       const bookData = await response.json();
       setSelectedBook(bookData);
@@ -59,8 +59,8 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
       }]);
       
       setIsModalOpen(false);
-      if (newBook.title) {
-        await fetchBookDetails(newBook.title);
+      if (newBook.id) {
+        await fetchBookDetails(newBook.id);
       }
     } catch (error) {
       console.error('Error creating book:', error);
@@ -179,7 +179,7 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
             {sortedBooks.map((book) => (
               <div
                 key={book.id}
-                onClick={() => fetchBookDetails(book.title)}
+                onClick={() => fetchBookDetails(book.id)}
                 className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 ${
                   book.id === selectedBook?.id ? 'bg-blue-50' : ''
                 }`}

@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import { 
   fetchBooks, 
-  fetchBookByTitle, 
+  fetchBookById, 
   addBook, 
   modifyBook, 
   removeBook 
@@ -18,10 +18,10 @@ export const getBooksController = async (req: Request, res: Response) => {
   }
 };
 
-export const getBookByTitleController = async (req: Request, res: Response) => {
+export const getBookByIdController = async (req: Request, res: Response) => {
   try {
-    const title = req.params.title;
-    const book = await fetchBookByTitle(title);
+    const id = req.params.id;
+    const book = await fetchBookById(id);
     
     if (!book) {
       return res.status(404).json({ error: 'Book not found' });
@@ -47,9 +47,9 @@ export const createBookController = async (req: Request, res: Response) => {
 
 export const updateBookController = async (req: Request, res: Response) => {
   try {
-    const { title } = req.params;
+    const { id } = req.params;
     const updates = req.body;
-    const updatedBook = await modifyBook(title, updates);
+    const updatedBook = await modifyBook(id, updates);
     return res.status(200).json(updatedBook);
   } catch (error) {
     console.error('Error:', error);
@@ -59,8 +59,8 @@ export const updateBookController = async (req: Request, res: Response) => {
 
 export const deleteBookController = async (req: Request, res: Response) => {
   try {
-    const { title } = req.params;
-    await removeBook(title);
+    const { id } = req.params;
+    await removeBook(id);
     return res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
