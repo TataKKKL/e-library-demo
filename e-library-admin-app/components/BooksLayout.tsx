@@ -85,10 +85,10 @@ export default function BooksLayout({ initialBooks }: BooksLayoutProps) {
       const selectedBooks = books.filter(book => selectedBookIds.has(String(book.id)));
       
       const deletePromises = selectedBooks.map(async (book) => {
-        const response = await fetch(`${baseUrl}/api/books/${encodeURIComponent(book.title)}`, {
+        const response = await fetch(`${baseUrl}/api/books/${encodeURIComponent(book.id)}`, {
           method: 'DELETE',
         });
-        if (!response.ok) throw new Error(`Failed to delete book ${book.title}`);
+        if (!response.ok) throw new Error(`Failed to delete book ${book.id}`);
       });
 
       await Promise.all(deletePromises);
