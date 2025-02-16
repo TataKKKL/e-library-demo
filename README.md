@@ -191,6 +191,7 @@ curl -X GET 'http://localhost:3001/api/profiles' \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
 ```
+
 ## 4. User Portal
 https://e-library-demo.vercel.app/
 
