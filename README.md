@@ -203,6 +203,7 @@ use email and password to login:
 email: danqing0703@gmail.com
 password: 123456
 ```
+or sign up with your own email and password:
 
 ## 5. Admin Portal
 https://e-library-admin-demo.vercel.app/
