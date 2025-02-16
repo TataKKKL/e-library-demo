@@ -198,6 +198,11 @@ https://e-library-demo.vercel.app/
 ```
 npm run dev
 ```
+use email and password to login:
+```
+email: danqing0703@gmail.com
+password: 123456
+```
 
 ## 5. Admin Portal
 https://e-library-admin-demo.vercel.app/
@@ -207,12 +212,10 @@ npm run dev
 ```
 since admin and user share the same supabase project, we created row management system and give admin user full access to the database.
 
-## 6. Additional Database Setup
-
-Run the following SQL migrations in your Supabase project:
-
-1. Navigate to the Supabase Dashboard
-2. Go to SQL Editor
-3. Copy and run the contents of `e-library-app/supabase/migrations/20240214_create_profiles.sql`
+use email and password to login:
+```
+email: danqing.zhang.personal@gmail.com
+password: 123456
+```
 
 
