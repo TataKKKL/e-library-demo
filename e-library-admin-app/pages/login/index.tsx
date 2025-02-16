@@ -22,14 +22,39 @@ export default function LoginPage({ user: initialUser }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   
   async function logIn() {
+    setLoading(true);
+    setErrorMessage('');
+    // First attempt to login
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       console.error(error);
+      setErrorMessage('Invalid credentials');
+      setLoading(false);
       return;
     }
-    router.push('/');
+
+    // After successful login, get user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Then check if user is admin
+    const { data } = await supabase
+      .from('profiles')
+      .select('user_role')
+      .eq('id', user?.id)
+      .single();
+
+    if (data?.user_role === 'admin') {
+      router.push('/');
+    } else {
+      // If not admin, log them out and show error message
+      await supabase.auth.signOut();
+      setErrorMessage('You do not have administrator access');
+      setLoading(false);
+    }
   }
 
   async function logOut() {
@@ -73,6 +98,11 @@ export default function LoginPage({ user: initialUser }: LoginPageProps) {
             </div>
           ) : (
             <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+              {errorMessage && (
+                <div className="text-red-600 text-sm font-medium text-center">
+                  {errorMessage}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -117,8 +147,9 @@ export default function LoginPage({ user: initialUser }: LoginPageProps) {
                 type="button"
                 className="w-full"
                 onClick={logIn}
+                disabled={loading}
               >
-                Sign In
+                {loading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
           )}
