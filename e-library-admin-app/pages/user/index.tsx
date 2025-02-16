@@ -1,5 +1,7 @@
 // pages/user/index.tsx
 import React, { useEffect, useState } from "react";
+import type { GetServerSidePropsContext } from 'next';
+import { createClient } from '@/utils/supabase/server-props';
 
 type Profile = {
   id: string;
@@ -92,3 +94,26 @@ const Home = () => {
 };
 
 export default Home;
+
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  // Create authenticated Supabase client
+  const supabase = createClient(context);
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Redirect to login if no authenticated user
+  if (!user) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      user,
+    },
+  };
+};
