@@ -26,6 +26,10 @@ A full-stack NextJS application that provides an interactive library interface.
 
 https://github.com/TataKKKL/e-library
 
+## Thesis
+A one-week side project to wrap up my fullstack learning from the past few months (August 2024 - February 2025). I spent one week (February 9-16) on this side project to get familiar with Supabase authentication and role-based access control (RBAC) through a standard CRUD application. I was already very familiar with Vercel deployment and the Next.js framework before I started.
+
+
 ## 1. Setup
 
 ### 1.1 Create .env file
