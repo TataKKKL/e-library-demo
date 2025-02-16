@@ -2,7 +2,7 @@ import React from 'react';
 import Head from 'next/head';
 import type { GetServerSidePropsContext } from 'next';
 import type { User } from '@supabase/supabase-js';
-import { withServerPropsAuth} from '@/utils/auth/authServerPropsHandler';
+import { withServerPropsAuth } from '@/utils/auth/authServerPropsHandler';
 import BooksLayout from '@/components/BooksLayout';
 import type { Book } from '@/interfaces/bookInterface';
 
@@ -42,7 +42,6 @@ const BooksPage: React.FC<BooksPageProps> = ({ user, books }) => {
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   console.log('[getServerSideProps] Starting books data fetch');
-  console.log('[getServerSideProps] Cookies:', context.req.cookies);
 
   // Get the Supabase cookie name
   const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || process.env.SUPABASE_PROJECT_ID;
@@ -51,11 +50,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   console.log('[getServerSideProps] Cookie value:', context.req.cookies[cookieName]);
 
   return withServerPropsAuth(context, async (user, accessToken) => {
-    console.log('[getServerSideProps] Auth check - User:', !!user);
-    console.log('[getServerSideProps] Auth check - Token:', !!accessToken);
+    // If no user is found, handle the redirect at a higher level
+    if (!user || !accessToken) {
+      console.log('[getServerSideProps] No authenticated user found');
+      return { props: undefined };
+    }
 
     try {
-      console.log('[getServerSideProps] Fetching books');
+      console.log('[getServerSideProps] Fetching books for authenticated user');
       const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://e-library-demo-api.vercel.app';
       const res = await fetch(`${baseUrl}/api/books`);
       
@@ -70,8 +72,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         author: book.author,
         created_at: book.created_at
       }));
-
-      console.log('[getServerSideProps] Fetched books:', books);
 
       return {
         props: {
