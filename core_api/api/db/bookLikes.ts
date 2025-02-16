@@ -8,7 +8,6 @@ interface BookLike {
 }
 
 export const toggleBookLike = async (profileId: string, bookId: number): Promise<boolean> => {
-  // First check if the like exists
   const { data: existingLike, error: fetchError } = await supabase
     .from('book_likes')
     .select('*')
@@ -16,12 +15,11 @@ export const toggleBookLike = async (profileId: string, bookId: number): Promise
     .eq('book_id', bookId)
     .single();
 
-  if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 is the "not found" error code
+  if (fetchError && fetchError.code !== 'PGRST116') {
     throw new Error(fetchError.message);
   }
 
   if (existingLike) {
-    // Unlike - delete the record
     const { error: deleteError } = await supabase
       .from('book_likes')
       .delete()
@@ -29,19 +27,28 @@ export const toggleBookLike = async (profileId: string, bookId: number): Promise
       .eq('book_id', bookId);
 
     if (deleteError) throw new Error(deleteError.message);
-    return false; // Indicates the book is now unliked
+    return false;
   } else {
-    // Like - insert new record
     const { error: insertError } = await supabase
       .from('book_likes')
       .insert([{ profile_id: profileId, book_id: bookId }]);
 
     if (insertError) throw new Error(insertError.message);
-    return true; // Indicates the book is now liked
+    return true;
   }
 };
 
-export const getBookLikes = async (bookId: number): Promise<BookLike[]> => {
+export const removeBookLike = async (profileId: string, bookId: number): Promise<void> => {
+  const { error } = await supabase
+    .from('book_likes')
+    .delete()
+    .eq('profile_id', profileId)
+    .eq('book_id', bookId);
+
+  if (error) throw new Error(error.message);
+};
+
+export const getBookLikes = async (bookId: number, userEmail: string): Promise<BookLike[]> => {
   const { data, error } = await supabase
     .from('book_likes')
     .select('*')

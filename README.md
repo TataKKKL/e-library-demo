@@ -159,9 +159,14 @@ curl -X POST 'https://[YOUR_SUPABASE_PROJECT_URL]/auth/v1/token?grant_type=passw
   }'
 
 # Toggle like for book with ID 123
-curl -X POST 'http://localhost:3001/api/book-likes/1' \
+curl -X POST 'http://localhost:3001/api/book-likes/1/toggle' \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json"
+
+# Remove like for book with ID 123
+curl -X DELETE \
+  'http://localhost:3001/api/book-likes/1/remove' \
+  -H 'Authorization: Bearer your-jwt-token'
 
 # Get user's liked books
 curl -X GET 'http://localhost:3001/api/book-likes/user' \
@@ -169,7 +174,7 @@ curl -X GET 'http://localhost:3001/api/book-likes/user' \
   -H "Content-Type: application/json"
 
 # Get all likes for book 123 (no auth needed)
-curl -X GET 'http://localhost:3001/api/book-likes/book/1' \
+curl -X GET 'http://localhost:3001/api/book-likes/1' \
   -H "Content-Type: application/json"
 
 ```

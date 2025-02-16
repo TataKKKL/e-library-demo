@@ -3,19 +3,17 @@ import { Router } from 'express';
 import {
   toggleBookLikeController,
   getBookLikesController,
-  getUserLikesController
+  getUserLikesController,
+  removeBookLikeController
 } from '../controllers/bookLikes.controller';
-import { authenticateUser } from '../middleware/auth'; // Assuming you have auth middleware
+import { authenticateUser } from '../middleware/auth';
 
 const router = Router();
 
-// Toggle like for a book (requires authentication)
-router.post('/:bookId', authenticateUser, toggleBookLikeController);
-
-// Get all likes for a specific book
-router.get('/book/:bookId', getBookLikesController);
-
-// Get all books liked by the authenticated user
+// All routes require basic authentication
+router.post('/:bookId/toggle', authenticateUser, toggleBookLikeController);
+router.delete('/:bookId/remove', authenticateUser, removeBookLikeController);
 router.get('/user', authenticateUser, getUserLikesController);
+router.get('/:bookId', authenticateUser, getBookLikesController); // Admin check happens in DB layer
 
 export default router;

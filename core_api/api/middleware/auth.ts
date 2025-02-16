@@ -53,7 +53,6 @@ export const authenticateUser = async (
       role: user.role
     };
 
-    // Continue to the next middleware/route handler
     next();
   } catch (error) {
     console.error('Authentication error:', error);
