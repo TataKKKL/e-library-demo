@@ -1,13 +1,14 @@
 // bookLikes.controller.ts (Controller Layer)
 import { Request, Response } from 'express';
 import { 
-  toggleLike, 
+  addLike, 
   fetchBookLikes, 
   fetchUserBookLikes,
-  removeLike
+  removeLike,
+  fetchBookLikeStatus
 } from '../services/bookLikes.service';
 
-export const toggleBookLikeController = async (req: Request, res: Response) => {
+export const getBookLikeStatusController = async (req: Request, res: Response) => {
   try {
     const profileId = req.user?.id;
     if (!profileId) {
@@ -19,8 +20,28 @@ export const toggleBookLikeController = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid book ID' });
     }
 
-    const isLiked = await toggleLike(profileId, bookId);
-    return res.status(200).json({ liked: isLiked });
+    const isLiked = await fetchBookLikeStatus(profileId, bookId);
+    return res.status(200).json({ isLiked });
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const addBookLikeController = async (req: Request, res: Response) => {
+  try {
+    const profileId = req.user?.id;
+    if (!profileId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const bookId = parseInt(req.params.bookId);
+    if (isNaN(bookId)) {
+      return res.status(400).json({ error: 'Invalid book ID' });
+    }
+
+    const AddedNewLike = await addLike(profileId, bookId);
+    return res.status(200).json({ addednewlike: AddedNewLike });
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({ error: 'Internal Server Error' });

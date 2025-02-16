@@ -1,18 +1,20 @@
 // bookLikes.routes.ts (Routes)
 import { Router } from 'express';
 import {
-  toggleBookLikeController,
+  addBookLikeController,
   getBookLikesController,
   getUserLikesController,
-  removeBookLikeController
+  removeBookLikeController,
+  getBookLikeStatusController
 } from '../controllers/bookLikes.controller';
 import { authenticateUser } from '../middleware/auth';
 
 const router = Router();
 
 // All routes require basic authentication
-router.post('/:bookId/toggle', authenticateUser, toggleBookLikeController);
+router.post('/:bookId/add', authenticateUser, addBookLikeController);
 router.delete('/:bookId/remove', authenticateUser, removeBookLikeController);
+router.get('/:bookId/status', authenticateUser, getBookLikeStatusController);
 router.get('/user', authenticateUser, getUserLikesController);
 router.get('/:bookId', authenticateUser, getBookLikesController); // Admin check happens in DB layer
 

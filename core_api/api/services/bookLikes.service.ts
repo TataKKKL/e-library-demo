@@ -1,13 +1,14 @@
 // bookLikes.service.ts (Service Layer)
 import { 
-  toggleBookLike, 
+  addBookLike, 
   getBookLikes, 
   getUserBookLikes,
-  removeBookLike
+  removeBookLike,
+  getBookLikeStatus
 } from '../db/bookLikes';
 
-export const toggleLike = async (profileId: string, bookId: number): Promise<boolean> => {
-  return await toggleBookLike(profileId, bookId);
+export const addLike = async (profileId: string, bookId: number): Promise<boolean> => {
+  return await addBookLike(profileId, bookId);
 };
 
 export const removeLike = async (profileId: string, bookId: number): Promise<void> => {
@@ -20,4 +21,8 @@ export const fetchBookLikes = async (bookId: number, userEmail: string) => {
 
 export const fetchUserBookLikes = async (profileId: string) => {
   return await getUserBookLikes(profileId);
+};
+
+export const fetchBookLikeStatus = async (profileId: string, bookId: number): Promise<boolean> => {
+  return await getBookLikeStatus(profileId, bookId);
 };

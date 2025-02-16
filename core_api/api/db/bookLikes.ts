@@ -7,7 +7,8 @@ interface BookLike {
   created_at: string;
 }
 
-export const toggleBookLike = async (profileId: string, bookId: number): Promise<boolean> => {
+export const addBookLike = async (profileId: string, bookId: number): Promise<boolean> => {
+  // First check if like already exists
   const { data: existingLike, error: fetchError } = await supabase
     .from('book_likes')
     .select('*')
@@ -19,23 +20,18 @@ export const toggleBookLike = async (profileId: string, bookId: number): Promise
     throw new Error(fetchError.message);
   }
 
+  // If like already exists, do nothing and return false (no change made)
   if (existingLike) {
-    const { error: deleteError } = await supabase
-      .from('book_likes')
-      .delete()
-      .eq('profile_id', profileId)
-      .eq('book_id', bookId);
-
-    if (deleteError) throw new Error(deleteError.message);
     return false;
-  } else {
-    const { error: insertError } = await supabase
-      .from('book_likes')
-      .insert([{ profile_id: profileId, book_id: bookId }]);
-
-    if (insertError) throw new Error(insertError.message);
-    return true;
   }
+
+  // If no existing like, add new like
+  const { error: insertError } = await supabase
+    .from('book_likes')
+    .insert([{ profile_id: profileId, book_id: bookId }]);
+
+  if (insertError) throw new Error(insertError.message);
+  return true; // Return true to indicate a like was added
 };
 
 export const removeBookLike = async (profileId: string, bookId: number): Promise<void> => {
@@ -66,4 +62,19 @@ export const getUserBookLikes = async (profileId: string): Promise<BookLike[]> =
 
   if (error) throw new Error(error.message);
   return data as BookLike[];
+};
+
+export const getBookLikeStatus = async (profileId: string, bookId: number): Promise<boolean> => {
+  const { data, error } = await supabase
+    .from('book_likes')
+    .select('*')
+    .eq('profile_id', profileId)
+    .eq('book_id', bookId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    throw new Error(error.message);
+  }
+
+  return !!data;
 };
