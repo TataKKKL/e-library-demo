@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import type { Book } from '../../interfaces/bookInterface';
 import { GetStaticProps, GetStaticPaths } from 'next';
+import BookLikeButtons from '@/components/BookLikeButtons';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
@@ -87,13 +88,14 @@ const BookPage = ({ initialBook }: { initialBook: Book }) => {
               </div>
               <h3 className="mt-5 font-semibold text-xl">{initialBook.free ? "Free" : "Paid"}</h3>
               <div className="mt-4 ml-9">
-                <div className="flex justify-center">
+                <div className="flex justify-center gap-4">
                   <button
                     onClick={() => window.open(initialBook.source_url)}
                     className="w-38 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   >
                     Visit Website
                   </button>
+                  <BookLikeButtons bookId={initialBook.id} />
                 </div>
               </div>
             </div>
